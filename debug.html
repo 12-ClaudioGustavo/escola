@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Sistema de Declarações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white p-4">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🐛 Console de Debug</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Console -->
+            <div class="bg-gray-800 rounded-lg p-4">
+                <h2 class="text-xl font-bold mb-4">📋 Logs do Console</h2>
+                <div id="console" class="bg-black rounded p-3 font-mono text-sm h-96 overflow-y-auto border border-gray-600">
+                    <p class="text-gray-500">Aguardando logs...</p>
+                </div>
+                <button onclick="limparLogs()" class="mt-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded">
+                    Limpar Logs
+                </button>
+            </div>
+
+            <!-- Teste -->
+            <div class="bg-gray-800 rounded-lg p-4">
+                <h2 class="text-xl font-bold mb-4">🧪 Teste Rápido</h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm mb-2">Selecione uma classe:</label>
+                    <select id="testeClasse" onchange="testarClasse()" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
+                        <option value="">-- Selecionar --</option>
+                        <option value="1">1ª Classe (SEM NOTAS)</option>
+                        <option value="2">2ª Classe (COM NOTAS)</option>
+                        <option value="3">3ª Classe (SEM NOTAS)</option>
+                        <option value="4">4ª Classe (COM NOTAS)</option>
+                        <option value="5">5ª Classe (SEM NOTAS)</option>
+                        <option value="6">6ª Classe (COM NOTAS)</option>
+                    </select>
+                </div>
+
+                <div id="testeResultado" class="bg-black rounded p-3 font-mono text-sm border border-gray-600">
+                    <p class="text-gray-500">Selecione uma classe para testar...</p>
+                </div>
+
+                <div class="mt-4 space-y-2">
+                    <button onclick="verificarVariaveis()" class="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm">
+                        ✓ Verificar Variáveis
+                    </button>
+                    <button onclick="verificarFuncoes()" class="w-full bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-sm">
+                        ✓ Verificar Funções
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações -->
+        <div class="mt-6 bg-gray-800 rounded-lg p-4">
+            <h2 class="text-xl font-bold mb-4">ℹ️ Informações do Sistema</h2>
+            <div id="info" class="bg-black rounded p-3 font-mono text-sm max-h-48 overflow-y-auto border border-gray-600"></div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/ui.js"></script>
+
+    <script>
+        // Interceptar console.log
+        const originalLog = console.log;
+        const consoleDiv = document.getElementById('console');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const msg = args.map(arg => {
+                if (typeof arg === 'object') {
+                    return JSON.stringify(arg, null, 2);
+                }
+                return String(arg);
+            }).join(' ');
+            
+            const line = document.createElement('div');
+            line.className = 'text-green-400 mb-1';
+            line.textContent = '> ' + msg;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+
+        // Teste de Classe
+        function testarClasse() {
+            const classe = document.getElementById('testeClasse').value;
+            const resultado = document.getElementById('testeResultado');
+            
+            if (!classe) {
+                resultado.innerHTML = '<p class="text-gray-500">Selecione uma classe</p>';
+                return;
+            }
+
+            const semNotas = CLASSES_SEM_NOTAS.includes(classe);
+            const disciplinas = DISCIPLINAS[classe] || [];
+            
+            resultado.innerHTML = `
+                <p class="text-yellow-400 mb-2">Classe: <span class="text-white">${classe}</span></p>
+                <p class="text-yellow-400 mb-2">Sem Notas?: <span class="text-white">${semNotas ? 'SIM ❌' : 'NÃO ✓'}</span></p>
+                <p class="text-yellow-400 mb-2">Disciplinas: <span class="text-white">${disciplinas.length}</span></p>
+                <p class="text-gray-500 mt-3">Disciplinas:</p>
+                <ul class="text-blue-400 ml-4">
+                    ${disciplinas.map(d => `<li>• ${d}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        // Verificar Variáveis
+        function verificarVariaveis() {
+            console.log('========== VARIÁVEIS GLOBAIS ==========');
+            console.log('DISCIPLINAS:', typeof DISCIPLINAS !== 'undefined' ? '✓ Definido' : '✗ Indefinido');
+            console.log('CLASSES_SEM_NOTAS:', typeof CLASSES_SEM_NOTAS !== 'undefined' ? '✓ Definido' : '✗ Indefinido');
+            console.log('CLASSIFICACAO_NOTAS:', typeof CLASSIFICACAO_NOTAS !== 'undefined' ? '✓ Definido' : '✗ Indefinido');
+            console.log('ARREDONDAMENTO:', typeof ARREDONDAMENTO !== 'undefined' ? '✓ Definido' : '✗ Indefinido');
+            console.log('supabase:', typeof supabase !== 'undefined' ? '✓ Definido' : '✗ Indefinido');
+        }
+
+        // Verificar Funções
+        function verificarFuncoes() {
+            console.log('========== FUNÇÕES GLOBAIS ==========');
+            console.log('atualizarCamposNotas:', typeof atualizarCamposNotas !== 'undefined' ? '✓ Definida' : '✗ Indefinida');
+            console.log('openModal:', typeof openModal !== 'undefined' ? '✓ Definida' : '✗ Indefinida');
+            console.log('closeModal:', typeof closeModal !== 'undefined' ? '✓ Definida' : '✗ Indefinida');
+            console.log('adicionarAluno:', typeof adicionarAluno !== 'undefined' ? '✓ Definida' : '✗ Indefinida');
+        }
+
+        // Informações ao carregar
+        function mostrarInfo() {
+            const info = document.getElementById('info');
+            const texto = `
+User Agent: ${navigator.userAgent}
+LocalStorage disponível: ${typeof localStorage !== 'undefined' ? 'SIM' : 'NÃO'}
+Alunos em localStorage: ${localStorage.getItem('alunos') ? 'SIM' : 'NÃO'}
+Quantidade de alunos: ${localStorage.getItem('alunos') ? JSON.parse(localStorage.getItem('alunos')).length : 0}
+            `;
+            info.innerHTML = '<pre>' + texto + '</pre>';
+            verificarVariaveis();
+            verificarFuncoes();
+        }
+
+        function limparLogs() {
+            document.getElementById('console').innerHTML = '<p class="text-gray-500">Logs limpos...</p>';
+        }
+
+        // Carregar ao iniciar
+        window.addEventListener('load', mostrarInfo);
+    </script>
+</body>
+</html>

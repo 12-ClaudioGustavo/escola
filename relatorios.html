@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Sistema de Declarações Escolares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Relatórios</h1>
+            <a href="index.html" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg font-semibold transition">
+                ← Voltar ao Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Loader -->
+        <div id="loader" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <p class="mt-4 text-gray-700">Carregando...</p>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Filtros</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Classe</label>
+                    <select id="filterClasse" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todas as classes</option>
+                        <option value="1">1ª Classe</option>
+                        <option value="2">2ª Classe</option>
+                        <option value="3">3ª Classe</option>
+                        <option value="4">4ª Classe</option>
+                        <option value="5">5ª Classe</option>
+                        <option value="6">6ª Classe</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Buscar Aluno</label>
+                    <input type="text" id="filterAluno" placeholder="Nome ou matrícula..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="flex items-end gap-2">
+                    <button onclick="aplicarFiltros()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                        🔍 Filtrar
+                    </button>
+                    <button onclick="limparFiltros()" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-semibold transition">
+                        Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abas de Relatórios -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="flex border-b">
+                <button onclick="abrirAba('turmas')" id="tab-turmas" class="flex-1 px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 transition">
+                    📚 Por Turmas
+                </button>
+                <button onclick="abrirAba('desempenho')" id="tab-desempenho" class="flex-1 px-6 py-3 font-semibold text-gray-600 border-b-2 border-transparent hover:text-blue-600 transition">
+                    📊 Desempenho
+                </button>
+                <button onclick="abrirAba('frequencia')" id="tab-frequencia" class="flex-1 px-6 py-3 font-semibold text-gray-600 border-b-2 border-transparent hover:text-blue-600 transition">
+                    ✓ Frequência
+                </button>
+                <button onclick="abrirAba('estatisticas')" id="tab-estatisticas" class="flex-1 px-6 py-3 font-semibold text-gray-600 border-b-2 border-transparent hover:text-blue-600 transition">
+                    📈 Estatísticas
+                </button>
+            </div>
+
+            <!-- Aba: Por Turmas -->
+            <div id="aba-turmas" class="p-6">
+                <h3 class="text-xl font-bold mb-4">Alunos por Turma/Classe</h3>
+                <div id="relatorioPorTurmas" class="overflow-x-auto">
+                    <p class="text-gray-500">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Aba: Desempenho -->
+            <div id="aba-desempenho" class="p-6 hidden">
+                <h3 class="text-xl font-bold mb-4">Desempenho dos Alunos</h3>
+                <div id="relatorioDesempenho" class="overflow-x-auto">
+                    <p class="text-gray-500">Selecione uma classe para visualizar o desempenho</p>
+                </div>
+            </div>
+
+            <!-- Aba: Frequência -->
+            <div id="aba-frequencia" class="p-6 hidden">
+                <h3 class="text-xl font-bold mb-4">Relatório de Frequência</h3>
+                <div id="relatorioFrequencia" class="overflow-x-auto">
+                    <p class="text-gray-500">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Aba: Estatísticas -->
+            <div id="aba-estatisticas" class="p-6 hidden">
+                <h3 class="text-xl font-bold mb-4">Estatísticas Gerais</h3>
+                <div id="relatorioEstatisticas" class="overflow-x-auto">
+                    <p class="text-gray-500">Carregando...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opções de Exportação -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-xl font-bold mb-4">Exportar Dados</h3>
+            <div class="flex gap-4 flex-wrap">
+                <button onclick="exportarRelatorio('json')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                    📄 Exportar JSON
+                </button>
+                <button onclick="exportarRelatorio('csv')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                    📊 Exportar CSV
+                </button>
+                <button onclick="imprimirRelatorio()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                    🖨️ Imprimir
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mensagem Toast -->
+    <div id="messageContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/alunos.js"></script>
+    <script src="js/notas.js"></script>
+
+    <script>
+        let alunosFiltrados = [];
+        let dadosSupabase = {
+            alunos: [],
+            notas: []
+        };
+
+        // Helper function to safely show loader (compatible with ui.js)
+        function mostrarLoader(show = true) {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                if (show) {
+                    loader.classList.remove('hidden');
+                } else {
+                    loader.classList.add('hidden');
+                }
+            }
+        }
+
+        // Helper function to show messages (fallback if ui.js doesn't load)
+        function mostrarMensagem(tipo, mensagem) {
+            if (typeof window.mostrarMensagem === 'function') {
+                window.mostrarMensagem(tipo, mensagem);
+            } else {
+                console.log(`[${tipo}] ${mensagem}`);
+                alert(mensagem);
+            }
+        }
+
+        // Stub function to prevent errors from alunos.js calling renderizarTurmas
+        window.renderizarTurmas = function() {
+            console.log('renderizarTurmas called - stub function in relatorios.html');
+        };
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async () => {
+            await carregarDadosSupabase();
+            await gerarRelatorioPorTurmas();
+        });
+
+        // Carregar dados do Supabase
+        async function carregarDadosSupabase() {
+            try {
+                // Carregar alunos
+                const { data: alunos, error: alunosError } = await supabase
+                    .from('alunos')
+                    .select('*')
+                    .order('nome_completo');
+
+                if (alunosError) throw alunosError;
+
+                // Carregar notas
+                const { data: notas, error: notasError } = await supabase
+                    .from('notas')
+                    .select('*');
+
+                if (notasError) throw notasError;
+
+                dadosSupabase.alunos = alunos || [];
+                dadosSupabase.notas = notas || [];
+
+                // Atualizar alunosLocal para compatibilidade
+                window.alunosLocal = dadosSupabase.alunos;
+
+                console.log('Dados carregados do Supabase:', {
+                    alunos: dadosSupabase.alunos.length,
+                    notas: dadosSupabase.notas.length
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                mostrarMensagem('erro', 'Erro ao carregar dados do banco');
+            }
+        }
+
+        // Abrir abas
+        function abrirAba(aba) {
+            // Esconder todas as abas
+            document.querySelectorAll('[id^="aba-"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+
+            // Remove border de todos os tabs
+            document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                tab.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600');
+                tab.classList.add('border-b-2', 'border-transparent', 'text-gray-600');
+            });
+
+            // Mostrar aba selecionada
+            document.getElementById(`aba-${aba}`).classList.remove('hidden');
+            document.getElementById(`tab-${aba}`).classList.remove('border-transparent', 'text-gray-600');
+            document.getElementById(`tab-${aba}`).classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+
+            // Gerar relatório
+            if (aba === 'desempenho') {
+                gerarRelatorioDesempenho();
+            } else if (aba === 'turmas') {
+                gerarRelatorioPorTurmas();
+            } else if (aba === 'frequencia') {
+                gerarRelatorioFrequencia();
+            } else if (aba === 'estatisticas') {
+                gerarRelatorioEstatisticas();
+            }
+        }
+
+        // Gerar relatório por turmas
+        async function gerarRelatorioPorTurmas() {
+            const container = document.getElementById('relatorioPorTurmas');
+            if (!container) {
+                console.error('Container relatorioPorTurmas não encontrado');
+                return;
+            }
+
+            const alunos = alunosFiltrados.length > 0 ? alunosFiltrados : dadosSupabase.alunos;
+
+            if (!alunos || alunos.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhum aluno encontrado</p>';
+                return;
+            }
+
+            // Agrupar por classe
+            const turmas = {};
+            alunos.forEach(aluno => {
+                const classe = aluno.classe || 'Sem Classe';
+                if (!turmas[classe]) {
+                    turmas[classe] = [];
+                }
+                turmas[classe].push(aluno);
+            });
+
+            let html = '';
+            Object.entries(turmas).sort((a, b) => {
+                if (a[0] === 'Sem Classe') return 1;
+                if (b[0] === 'Sem Classe') return -1;
+                return a[0].localeCompare(b[0]);
+            }).forEach(([classe, alunosDaClasse]) => {
+                html += `
+                    <div class="mb-8 page-break">
+                        <h4 class="text-lg font-bold text-blue-600 mb-3">Classe: ${classe} (${alunosDaClasse.length} alunos)</h4>
+                        <table class="w-full border-collapse border border-gray-300">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="border border-gray-300 px-4 py-2 text-left">Nº</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-left">Nome Completo</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-left">Turma</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-left">Gênero</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-center">Data de Nascimento</th>
+                                    <th class="border border-gray-300 px-4 py-2 text-center">Data Cadastro</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                alunosDaClasse.forEach((aluno, idx) => {
+                    const generoLabel = aluno.genero === 'M' ? 'Masculino' : aluno.genero === 'F' ? 'Feminino' : '-';
+                    const dataNascimento = aluno.data_nascimento ? new Date(aluno.data_nascimento).toLocaleDateString('pt-BR') : '-';
+                    html += `
+                        <tr class="hover:bg-gray-50">
+                            <td class="border border-gray-300 px-4 py-2">${idx + 1}</td>
+                            <td class="border border-gray-300 px-4 py-2">${aluno.nome_completo}</td>
+                            <td class="border border-gray-300 px-4 py-2">${aluno.turma || '-'}</td>
+                            <td class="border border-gray-300 px-4 py-2">${generoLabel}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">${dataNascimento}</td>
+                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                ${aluno.created_at ? new Date(aluno.created_at).toLocaleDateString('pt-BR') : '-'}
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Gerar relatório de desempenho
+        async function gerarRelatorioDesempenho() {
+            const container = document.getElementById('relatorioDesempenho');
+            if (!container) {
+                console.error('Container relatorioDesempenho não encontrado');
+                return;
+            }
+
+            const classe = document.getElementById('filterClasse').value;
+
+            if (!classe) {
+                container.innerHTML = '<p class="text-gray-500">Selecione uma classe para visualizar o desempenho</p>';
+                return;
+            }
+
+            const alunos = dadosSupabase.alunos.filter(a => a.classe === classe);
+
+            if (!alunos || alunos.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhum aluno encontrado nesta classe</p>';
+                return;
+            }
+
+            // Classes sem notas
+            if (typeof CLASSES_SEM_NOTAS !== 'undefined' && CLASSES_SEM_NOTAS.includes(classe)) {
+                container.innerHTML = '<p class="text-blue-600">Esta classe não possui notas registradas</p>';
+                return;
+            }
+
+            const disciplinas = (typeof DISCIPLINAS !== 'undefined' && DISCIPLINAS[classe]) ? DISCIPLINAS[classe] : [];
+
+            if (disciplinas.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhuma disciplina configurada para esta classe</p>';
+                return;
+            }
+
+            // Buscar notas dos alunos
+            const alunosComNotas = await Promise.all(alunos.map(async (aluno) => {
+                const notasAluno = dadosSupabase.notas.filter(n => n.aluno_id === aluno.id);
+                const notasPorDisciplina = {};
+
+                notasAluno.forEach(nota => {
+                    notasPorDisciplina[nota.disciplina] = nota.nota_final || nota.nota;
+                });
+
+                return {
+                    ...aluno,
+                    notas: notasPorDisciplina
+                };
+            }));
+
+            let html = `
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600">Classe: <strong>${classe}ª Classe</strong> | Total de Alunos: <strong>${alunos.length}</strong></p>
+                </div>
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead class="bg-blue-100">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Nº</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Aluno</th>
+            `;
+
+            disciplinas.forEach(disc => {
+                html += `<th class="border border-gray-300 px-4 py-2 text-center text-sm">${disc}</th>`;
+            });
+
+            html += `
+                            <th class="border border-gray-300 px-4 py-2 text-center font-bold">Média</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center font-bold">Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            alunosComNotas.forEach((aluno, idx) => {
+                html += `<tr class="hover:bg-gray-50">
+                    <td class="border border-gray-300 px-4 py-2">${idx + 1}</td>
+                    <td class="border border-gray-300 px-4 py-2 font-semibold">${aluno.nome_completo}</td>
+                `;
+
+                let totalNotas = [];
+                disciplinas.forEach(disc => {
+                    const nota = aluno.notas[disc];
+                    if (nota !== undefined && nota !== null && nota !== '') {
+                        const notaNum = parseFloat(nota);
+                        if (!isNaN(notaNum)) {
+                            totalNotas.push(notaNum);
+                            html += `<td class="border border-gray-300 px-4 py-2 text-center">${notaNum.toFixed(1)}</td>`;
+                        } else {
+                            html += `<td class="border border-gray-300 px-4 py-2 text-center">-</td>`;
+                        }
+                    } else {
+                        html += `<td class="border border-gray-300 px-4 py-2 text-center">-</td>`;
+                    }
+                });
+
+                let media = '-';
+                let situacao = '-';
+                let corSituacao = 'text-gray-500';
+
+                if (totalNotas.length > 0) {
+                    const somaNotas = totalNotas.reduce((a, b) => a + b, 0);
+                    media = (somaNotas / totalNotas.length).toFixed(1);
+
+                    if (parseFloat(media) >= 10) {
+                        situacao = 'Aprovado';
+                        corSituacao = 'text-green-600 font-bold';
+                    } else {
+                        situacao = 'Reprovado';
+                        corSituacao = 'text-red-600 font-bold';
+                    }
+                }
+
+                html += `
+                    <td class="border border-gray-300 px-4 py-2 text-center font-bold">${media}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center ${corSituacao}">${situacao}</td>
+                </tr>`;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Gerar relatório de frequência
+        async function gerarRelatorioFrequencia() {
+            const container = document.getElementById('relatorioFrequencia');
+            if (!container) {
+                console.error('Container relatorioFrequencia não encontrado');
+                return;
+            }
+
+            const alunos = dadosSupabase.alunos;
+
+            if (!alunos || alunos.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhum aluno encontrado</p>';
+                return;
+            }
+
+            // Buscar dados de frequência (assumindo que existe uma tabela de frequência)
+            try {
+                const { data: frequencias, error } = await supabase
+                    .from('frequencia')
+                    .select('*');
+
+                if (error) throw error;
+
+                // Agrupar por classe
+                const porClasse = {};
+                alunos.forEach(aluno => {
+                    const classe = aluno.classe || 'Sem Classe';
+                    if (!porClasse[classe]) {
+                        porClasse[classe] = [];
+                    }
+
+                    const frequenciaAluno = frequencias?.filter(f => f.aluno_id === aluno.id) || [];
+                    const totalPresencas = frequenciaAluno.filter(f => f.presente).length;
+                    const totalAulas = frequenciaAluno.length;
+                    const percentual = totalAulas > 0 ? ((totalPresencas / totalAulas) * 100).toFixed(1) : 0;
+
+                    porClasse[classe].push({
+                        ...aluno,
+                        presencas: totalPresencas,
+                        totalAulas: totalAulas,
+                        percentual: percentual
+                    });
+                });
+
+                let html = '';
+                Object.entries(porClasse).sort().forEach(([classe, alunosDaClasse]) => {
+                    html += `
+                        <div class="mb-8 page-break">
+                            <h4 class="text-lg font-bold text-blue-600 mb-3">Classe: ${classe}</h4>
+                            <table class="w-full border-collapse border border-gray-300">
+                                <thead class="bg-blue-100">
+                                    <tr>
+                                        <th class="border border-gray-300 px-4 py-2 text-left">Nº</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-left">Nome Completo</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center">Presenças</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center">Total Aulas</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center">Percentual</th>
+                                        <th class="border border-gray-300 px-4 py-2 text-center">Situação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    alunosDaClasse.forEach((aluno, idx) => {
+                        const situacao = parseFloat(aluno.percentual) >= 75 ? 'Aprovado' : 'Reprovado';
+                        const corSituacao = parseFloat(aluno.percentual) >= 75 ? 'text-green-600 font-bold' : 'text-red-600 font-bold';
+
+                        html += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="border border-gray-300 px-4 py-2">${idx + 1}</td>
+                                <td class="border border-gray-300 px-4 py-2">${aluno.nome_completo}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">${aluno.presencas}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center">${aluno.totalAulas}</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center font-bold">${aluno.percentual}%</td>
+                                <td class="border border-gray-300 px-4 py-2 text-center ${corSituacao}">${situacao}</td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Erro ao carregar frequência:', error);
+                container.innerHTML = `
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-4">
+                        <p class="text-yellow-800">⚠️ Tabela de frequência não configurada ou sem dados.</p>
+                        <p class="text-sm text-gray-600 mt-2">Para ativar este relatório, certifique-se de que existe uma tabela "frequencia" no banco de dados.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Gerar relatório de estatísticas
+        async function gerarRelatorioEstatisticas() {
+            const container = document.getElementById('relatorioEstatisticas');
+            if (!container) {
+                console.error('Container relatorioEstatisticas não encontrado');
+                return;
+            }
+
+            const alunos = dadosSupabase.alunos;
+
+            if (!alunos || alunos.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Nenhum dado disponível</p>';
+                return;
+            }
+
+            // Estatísticas gerais
+            const totalAlunos = alunos.length;
+            const masculino = alunos.filter(a => a.genero === 'M').length;
+            const feminino = alunos.filter(a => a.genero === 'F').length;
+
+            // Por classe
+            const porClasse = {};
+            alunos.forEach(aluno => {
+                const classe = aluno.classe || 'Sem Classe';
+                if (!porClasse[classe]) {
+                    porClasse[classe] = { total: 0, M: 0, F: 0 };
+                }
+                porClasse[classe].total++;
+                if (aluno.genero === 'M') porClasse[classe].M++;
+                if (aluno.genero === 'F') porClasse[classe].F++;
+            });
+
+            let html = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-600">${totalAlunos}</div>
+                        <div class="text-gray-700 font-semibold mt-2">Total de Alunos</div>
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-green-600">${masculino}</div>
+                        <div class="text-gray-700 font-semibold mt-2">Alunos Masculinos</div>
+                        <div class="text-sm text-gray-500">${((masculino/totalAlunos)*100).toFixed(1)}%</div>
+                    </div>
+                    <div class="bg-pink-50 border border-pink-200 rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-pink-600">${feminino}</div>
+                        <div class="text-gray-700 font-semibold mt-2">Alunos Femininos</div>
+                        <div class="text-sm text-gray-500">${((feminino/totalAlunos)*100).toFixed(1)}%</div>
+                    </div>
+                </div>
+
+                <h4 class="text-lg font-bold text-blue-600 mb-4">Distribuição por Classe</h4>
+                <table class="w-full border-collapse border border-gray-300 mb-8">
+                    <thead class="bg-blue-100">
+                        <tr>
+                            <th class="border border-gray-300 px-4 py-2 text-left">Classe</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center">Total</th>
+                            <th class="border border-gray-300 px-4 py-2 text-center">Masculino</th>
+                            <th class="border border-gray-300 

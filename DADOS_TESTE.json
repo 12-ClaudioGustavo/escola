@@ -1,0 +1,198 @@
+{
+  "alunos_teste": [
+    {
+      "id": "1",
+      "nome_completo": "João Pedro Silva",
+      "classe": "4",
+      "bi": "001234567LA001",
+      "data_emissao_documento": "2019-05-15",
+      "nome_pai": "Miguel Silva Santos",
+      "nome_mae": "Maria do Carmo Silva",
+      "turma": "A",
+      "notas": {
+        "Língua Portuguesa": 7.5,
+        "Matemática": 8.2,
+        "Estudo do Meio": 7.8,
+        "Educação M. e Plástica": 8.0,
+        "Educação Músical": 7.3,
+        "Educação Física": 8.5,
+        "Lingua Kikongo": 6.9
+      },
+      "data_cadastro": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "2",
+      "nome_completo": "Ana Carolina Sousa",
+      "classe": "4",
+      "bi": "002234567LA001",
+      "data_emissao_documento": "2020-03-20",
+      "nome_pai": "Roberto Sousa Costa",
+      "nome_mae": "Fernanda Dias Sousa",
+      "turma": "A",
+      "notas": {
+        "Língua Portuguesa": 8.9,
+        "Matemática": 9.2,
+        "Estudo do Meio": 8.7,
+        "Educação M. e Plástica": 8.5,
+        "Educação Músical": 8.2,
+        "Educação Física": 7.8,
+        "Lingua Kikongo": 8.4
+      },
+      "data_cadastro": "2024-01-16T14:20:00Z"
+    },
+    {
+      "id": "3",
+      "nome_completo": "Manuel Tavares Lemos",
+      "classe": "4",
+      "bi": "003234567LA001",
+      "data_emissao_documento": "2018-07-10",
+      "nome_pai": "Albano Tavares",
+      "nome_mae": "Joana Lemos Tavares",
+      "turma": "B",
+      "notas": {
+        "Língua Portuguesa": 6.5,
+        "Matemática": 7.1,
+        "Estudo do Meio": 6.8,
+        "Educação M. e Plástica": 7.2,
+        "Educação Músical": 6.3,
+        "Educação Física": 8.0,
+        "Lingua Kikongo": 6.1
+      },
+      "data_cadastro": "2024-01-17T09:45:00Z"
+    },
+    {
+      "id": "4",
+      "nome_completo": "Luciana Benedita Neves",
+      "classe": "6",
+      "bi": "004234567LA001",
+      "data_emissao_documento": "2019-11-05",
+      "nome_pai": "Nzila Neves Konde",
+      "nome_mae": "Madalena Benedita",
+      "turma": "A",
+      "notas": {
+        "Língua Portuguesa": 8.0,
+        "Matemática": 8.5,
+        "Ciências da Natureza": 8.3,
+        "História": 7.9,
+        "Geografia": 8.1,
+        "Educação M. e Cívica": 8.2,
+        "Educação Musical": 7.6,
+        "Educação Física": 8.4,
+        "Língua Kikongo": 7.8
+      },
+      "data_cadastro": "2024-01-18T11:15:00Z"
+    },
+    {
+      "id": "5",
+      "nome_completo": "David Kakembo Silva",
+      "classe": "6",
+      "bi": "005234567LA001",
+      "data_emissao_documento": "2020-01-30",
+      "nome_pai": "Francisco Kakembo",
+      "nome_mae": "Teresa Silva Kakembo",
+      "turma": "B",
+      "notas": {
+        "Língua Portuguesa": 7.2,
+        "Matemática": 6.8,
+        "Ciências da Natureza": 7.0,
+        "História": 6.9,
+        "Geografia": 7.1,
+        "Educação M. e Cívica": 7.3,
+        "Educação Musical": 6.7,
+        "Educação Física": 8.2,
+        "Língua Kikongo": 7.0
+      },
+      "data_cadastro": "2024-01-19T13:30:00Z"
+    },
+    {
+      "id": "6",
+      "nome_completo": "Cristina Madalena Santos",
+      "classe": "2",
+      "bi": "006234567LA001",
+      "data_emissao_documento": "2021-08-12",
+      "nome_pai": "Armando Santos Costa",
+      "nome_mae": "Amélia Madalena Santos",
+      "turma": "A",
+      "notas": {},
+      "data_cadastro": "2024-01-20T08:00:00Z"
+    },
+    {
+      "id": "7",
+      "nome_completo": "Rui Cândido Xongo",
+      "classe": "4",
+      "bi": "007234567LA001",
+      "data_emissao_documento": "2019-09-22",
+      "nome_pai": "Raúl Xongo Lumina",
+      "nome_mae": "Conceição Cândido",
+      "turma": "A",
+      "notas": {
+        "Língua Portuguesa": 7.8,
+        "Matemática": 7.5,
+        "Estudo do Meio": 7.6,
+        "Educação M. e Plástica": 7.4,
+        "Educação Músical": 7.2,
+        "Educação Física": 8.3,
+        "Lingua Kikongo": 7.7
+      },
+      "data_cadastro": "2024-01-21T10:45:00Z"
+    },
+    {
+      "id": "8",
+      "nome_completo": "Sofia Rosário Bandeira",
+      "classe": "6",
+      "bi": "008234567LA001",
+      "data_emissao_documento": "2018-06-14",
+      "nome_pai": "José Bandeira Rosário",
+      "nome_mae": "Cecília Rosário Bandeira",
+      "turma": "A",
+      "notas": {
+        "Língua Portuguesa": 9.0,
+        "Matemática": 9.3,
+        "Ciências da Natureza": 9.1,
+        "História": 8.8,
+        "Geografia": 9.0,
+        "Educação M. e Cívica": 8.9,
+        "Educação Musical": 8.7,
+        "Educação Física": 8.5,
+        "Língua Kikongo": 8.9
+      },
+      "data_cadastro": "2024-01-22T15:20:00Z"
+    },
+    {
+      "id": "9",
+      "nome_completo": "Paulo Henrique Barbosa",
+      "classe": "2",
+      "bi": "009234567LA001",
+      "data_emissao_documento": "2021-02-18",
+      "nome_pai": "Hélio Barbosa Silva",
+      "nome_mae": "Graça Henrique",
+      "turma": "B",
+      "notas": {},
+      "data_cadastro": "2024-01-23T12:10:00Z"
+    },
+    {
+      "id": "10",
+      "nome_completo": "Vanessa Lúcia Nkala",
+      "classe": "4",
+      "bi": "010234567LA001",
+      "data_emissao_documento": "2020-04-25",
+      "nome_pai": "Bemilson Nkala",
+      "nome_mae": "Lúcia Cavanda Nkala",
+      "turma": "B",
+      "notas": {
+        "Língua Portuguesa": 8.2,
+        "Matemática": 8.4,
+        "Estudo do Meio": 8.1,
+        "Educação M. e Plástica": 8.3,
+        "Educação Músical": 8.0,
+        "Educação Física": 7.9,
+        "Lingua Kikongo": 8.5
+      },
+      "data_cadastro": "2024-01-24T16:35:00Z"
+    }
+  ],
+  "instrucoes": {
+    "pt": "Para adicionar estes dados ao localStorage, abra o console (F12) e execute: localStorage.setItem('alunos', JSON.stringify(window.dados_teste.alunos_teste))",
+    "en": "To add this data to localStorage, open the console (F12) and run: localStorage.setItem('alunos', JSON.stringify(window.dados_teste.alunos_teste))"
+  }
+}
