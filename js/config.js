@@ -39,7 +39,7 @@ const CLASSES_SEM_NOTAS = [];
 
 // Configurações da Escola
 const CONFIG_ESCOLA = {
-    nomeEscola: 'Complexo Escolar nº 271',
+    nomeEscola: 'Complexo Escolar nº',
     numeroEscola: '271',
     cidade: 'Mbanza Kongo',
     diretorNome: 'Alberto Fernando António',
