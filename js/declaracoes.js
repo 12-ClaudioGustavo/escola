@@ -272,8 +272,8 @@ function gerarHTMLDeclaracao(aluno, turma, anoLetivo) {
                     position: absolute;
                     top: 0;
                     left: 0;
-                    right: 10mm;
-                    bottom: 10mm;
+                    right: 0;
+                    bottom: 0;
                     pointer-events: none;
                     height: calc(297mm - 20mm);
                     width: calc(210mm - 20mm);
